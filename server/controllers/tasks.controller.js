@@ -1,10 +1,16 @@
 import { pool } from "../db.js";
 
 export const getTasks = async (req, res) => {
-  const [result] = await pool.query(
-    "SELECT * FROM tasks ORDER BY createAt ASC"
-  );
+  try {
+    const [result] = await pool.query(
+      "SELECT * FROM tasks ORDER BY createAt ASC"
+    );
     res.json(result);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: `Internal server error / ${error}` });
+  }
 };
 export const getTask = async (req, res) => {
   try {
@@ -23,18 +29,24 @@ export const getTask = async (req, res) => {
   }
 };
 export const createTask = async (req, res) => {
-  //console.log(req.body);ç
-  const { title, description } = req.body;
-  const [result] = await pool.query(
-    "INSERT INTO tasks(title, description) VALUES(?,?)",
-    [title, description]
-  );
-  //console.log(result);
-  res.json({
-    id: result.insertId,
-    title,
-    description,
-  });
+  try {
+    //console.log(req.body);ç
+    const { title, description } = req.body;
+    const [result] = await pool.query(
+      "INSERT INTO tasks(title, description) VALUES(?,?)",
+      [title, description]
+    );
+    //console.log(result);
+    res.json({
+      id: result.insertId,
+      title,
+      description,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: `Internal server error / ${error}` });
+  }
 };
 export const updateTask = async (req, res) => {
   try {
